@@ -14,10 +14,6 @@ public class BurgerSet extends Product {
         this.drink = drink;
     }
 
-    public Hamburger getHamburger() {
-        return hamburger;
-    }
-
     public Side getSide() {
         return side;
     }
