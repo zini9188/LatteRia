@@ -11,6 +11,8 @@ import app.operator.Menu;
 import app.operator.Order;
 import app.product.ProductRepository;
 
+import java.util.ArrayList;
+
 public class AppConfigurer {
     private Cart cart;
 
@@ -27,14 +29,14 @@ public class AppConfigurer {
     }
 
     public Discount discount() {
-        return new Discount(new DiscountCondition[]{
-                new CouponDiscountCondition(new FixedAmountDiscount(1000)),
-                new KidDiscountCondition(new FixedRateDiscount(10))
-        });
+        return new Discount(new ArrayList<>() {{
+            add(new CouponDiscountCondition(new FixedAmountDiscount(1000)));
+            add(new KidDiscountCondition(new FixedRateDiscount(10)));
+        }});
     }
 
     public Cart cart() {
-        if(cart == null) cart = new Cart(productRepository(), menu());
+        if (cart == null) cart = new Cart(productRepository(), menu());
         return cart;
     }
 }

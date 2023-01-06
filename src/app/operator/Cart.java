@@ -1,5 +1,6 @@
 package app.operator;
 
+import app.Reader;
 import app.product.Product;
 import app.product.ProductRepository;
 import app.product.food.BurgerSet;
@@ -7,16 +8,12 @@ import app.product.food.Drink;
 import app.product.food.Hamburger;
 import app.product.food.Side;
 
-import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Cart {
-
-    private Product[] products = new Product[0];
-
+    private ArrayList<Product> products = new ArrayList<>();
     private ProductRepository productRepository;
     private Menu menu;
-
-    private Scanner scanner = new Scanner(System.in);
 
     public Cart(ProductRepository productRepository, Menu menu) {
         this.productRepository = productRepository;
@@ -32,28 +29,34 @@ public class Cart {
             if (hamburger.isBurgerSet()) product = setCompose(hamburger);
         }
 
-        Product[] newProducts = new Product[products.length + 1];
-        System.arraycopy(products, 0, newProducts, 0, products.length);
-        newProducts[products.length] = product;
-        products = newProducts;
+        Product newProduct;
+        if (product instanceof Hamburger) newProduct = new Hamburger((Hamburger) product);
+        else if (product instanceof Side) newProduct = new Side((Side) product);
+        else if (product instanceof Drink) newProduct = new Drink((Drink) product);
+        else if (product instanceof BurgerSet) newProduct = product;
+        else newProduct = null;
+
+        products.add(newProduct);
     }
 
     private Product setCompose(Hamburger hamburger) {
         menu.printSide();
-        int sideId = Integer.parseInt(scanner.nextLine());
+        int sideId = Reader.readInteger();
         Side side = (Side) productRepository.findById(sideId);
-        chooseOption(side);
+        Side newSide = new Side(side);
+        chooseOption(newSide);
 
         menu.printDrink();
-        int drinkId = Integer.parseInt(scanner.nextLine());
+        int drinkId = Reader.readInteger();
         Drink drink = (Drink) productRepository.findById(drinkId);
-        chooseOption(drink);
+        Drink newDrink = new Drink(drink);
+        chooseOption(newDrink);
 
         String name = hamburger.getName() + "세트";
         int price = hamburger.getSetPrice() + drink.getPrice() + side.getPrice();
         int kcal = hamburger.getKcal() + drink.getKcal() + side.getKcal();
 
-        return new BurgerSet(name, price, kcal, hamburger, side, drink);
+        return new BurgerSet(name, price, kcal, hamburger, newSide, newDrink);
     }
 
     private void chooseOption(Product product) {
@@ -61,31 +64,18 @@ public class Cart {
             System.out.printf(
                     "단품으로 주문하시겠어요? (1)_단품(%d원) (2)_세트(%d원)\n",
                     product.getPrice(), ((Hamburger) product).getSetPrice());
-            String input = scanner.nextLine();
+            String input = Reader.readString();
             if (input.equals("2")) ((Hamburger) product).setBurgerSet(true);
         } else if (product instanceof Side) {
-            System.out.printf("케첩은 몇개가 필요하신가요?\n");
-            String input = scanner.nextLine();
-            if (input.equals("2")) ((Side) product).setKetchup(Integer.parseInt(input));
+            System.out.print("케첩은 몇개가 필요하신가요?\n");
+            int amount = Reader.readInteger();
+            ((Side) product).setKetchup(amount);
         } else if (product instanceof Drink) {
-            System.out.printf("빨대가 필요하신가요? (1)_예 (2)_아니오\n");
-            String input = scanner.nextLine();
+            System.out.print("빨대가 필요하신가요? (1)_예 (2)_아니오\n");
+            String input = Reader.readString();
             if (input.equals("1")) ((Drink) product).setStraw(true);
+            else ((Drink) product).setStraw(false);
         }
-    }
-
-    public void printCart() {
-        System.out.println("🧺 장바구니");
-        System.out.println("-".repeat(60));
-
-        printCartDetail();
-
-        System.out.println("-".repeat(60));
-        System.out.printf("합계 : %d원\n", calculateTotalPrice());
-
-        System.out.println("이전으로 돌아가려면 엔터를 누르세요.");
-        scanner.nextLine();
-
     }
 
     protected int calculateTotalPrice() {
@@ -94,6 +84,16 @@ public class Cart {
             sum += product.getPrice();
         }
         return sum;
+    }
+
+    public void printCart() {
+        System.out.println("🧺 장바구니");
+        System.out.println("-".repeat(60));
+        printCartDetail();
+        System.out.println("-".repeat(60));
+        System.out.printf("합계 : %d원\n", calculateTotalPrice());
+        System.out.println("이전으로 돌아가려면 엔터를 누르세요.");
+        Reader.readString();
     }
 
     protected void printCartDetail() {
