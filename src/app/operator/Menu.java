@@ -5,7 +5,6 @@ import app.product.food.Drink;
 import app.product.food.Hamburger;
 import app.product.food.Side;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class Menu {
@@ -28,21 +27,13 @@ public class Menu {
 
     protected void printHamburger() {
         System.out.println("\uD83C\uDF54 햄버거\n");
-        for (Product product : products) {
-            if (product instanceof Hamburger) {
-                printEachMenu(product);
-            }
-        }
+        products.stream().filter(product -> product instanceof Hamburger).forEach(this::printEachMenu);
         System.out.println();
     }
 
     protected void printSide() {
         System.out.println("\uD83C\uDF5F 사이드\n");
-        for (Product product : products) {
-            if (product instanceof Side) {
-                printEachMenu(product);
-            }
-        }
+        products.stream().filter(product -> product instanceof Side).forEach(this::printEachMenu);
         System.out.println();
     }
 
