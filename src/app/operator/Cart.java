@@ -64,26 +64,18 @@ public class Cart {
             System.out.printf(
                     "단품으로 주문하시겠어요? (1)_단품(%d원) (2)_세트(%d원)\n",
                     product.getPrice(), ((Hamburger) product).getSetPrice());
-            String input = Reader.readString();
-            if (input.equals("2")) ((Hamburger) product).setBurgerSet(true);
+            ((Hamburger) product).setBurgerSet(Reader.readString().equals("2"));
         } else if (product instanceof Side) {
             System.out.print("케첩은 몇개가 필요하신가요?\n");
-            int amount = Reader.readInteger();
-            ((Side) product).setKetchup(amount);
+            ((Side) product).setKetchup(Reader.readInteger());
         } else if (product instanceof Drink) {
             System.out.print("빨대가 필요하신가요? (1)_예 (2)_아니오\n");
-            String input = Reader.readString();
-            if (input.equals("1")) ((Drink) product).setStraw(true);
-            else ((Drink) product).setStraw(false);
+            ((Drink) product).setStraw(Reader.readString().equals("1"));
         }
     }
 
     protected int calculateTotalPrice() {
-        int sum = 0;
-        for (Product product : products) {
-            sum += product.getPrice();
-        }
-        return sum;
+        return products.stream().mapToInt(Product::getPrice).sum();
     }
 
     public void printCart() {

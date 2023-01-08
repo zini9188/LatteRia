@@ -18,9 +18,7 @@ public class KidDiscountCondition implements DiscountCondition {
     @Override
     public void checkDiscountCondition() {
         System.out.println("20세 미만입니까? (1)_예 (2)_아니오");
-        int input = Reader.readDiscount();
-        if (input == 1) setSatisfied(true);
-        else if (input == 2) setSatisfied(false);
+        setSatisfied(Reader.readDiscount() == 1);
     }
 
     @Override
